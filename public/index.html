@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <link rel="stylesheet" href="style.css">
+    <title>URL SHORTNER</title>
+</head>
+<body>
+  <!-- WE MADE AN API WHENVER USER CALL SHORTEN, NOW FRONT NEED TO CALL THE API -->
+
+ <div class="container url-shortener">
+  <h1 class="section-title" style="text-align: center;text-decoration-line: underline;background-color: antiquewhite;" style >URL Shortener</h1>
+
+  <form id="shorten-form" class="shortener-form">
+    <div class="form-group">
+      <label for="url"></label>
+      <input type="url" name="url" id="url" placeholder="enter your long url" required>
+    </div>
+
+    <div class="form-group">
+      <label for="shortCode"></label>
+      <input type="text" name="shortCode" id="shortCode" placeholder="enter your shortcode" required>
+    </div>
+
+    <button type="submit" class="form-submit">Shorten URL</button>
+  </form>
+
+  <div class="shortened-urls">
+    <h2 class="section-title" style="text-align: center">Shortened URLs:</h2>
+    <ul id="shorten-urls" class="url-list"></ul>
+  </div>
+</div>
+
+   <script>
+    const fetchShotenedUrls = async () => {
+      try{
+        const response = await fetch('/links');
+        //below we get the data from backend in form of JSON string and we need to convert it into object using json() method
+      const links=await response.json();
+      const listoflink=document.getElementById('shorten-urls');
+      listoflink.innerHTML="";
+      //we need to get all the data inside of object  using 
+      //for in loop because we need to get both key and value of object and then we will show it in list in index.html  
+          for(const [shortCode,url] of Object.entries(links)){
+           const li=document.createElement('li');
+           const truncatedURL=url.length>=30? `${url.slice(0,30)}...`:url;
+           li.innerHTML=` <a href="${shortCode}" target="_blank">${window.location.origin}/${shortCode}</a> → <span>${truncatedURL}</span>`;   
+                 listoflink.appendChild(li);
+      }
+  
+    }
+    catch(error){
+      console.error("Error fetching shortened URLs:", error);
+    }
+  }
+
+/*
+  document.getElementById('shorten-form')
+  → HTML me jo form ka id hai "shorten-form"
+  usko select kar rahe hain.
+*/
+document.getElementById('shorten-form')
+
+/*
+  addEventListener('submit', ...)
+  → jab user form submit kare (button dabaye)
+  tab ye function chalega.
+*/
+.addEventListener('submit', async (e) => {
+
+  /*
+    e = event object
+    preventDefault()
+    → form normally page reload karta hai
+    hum reload rok rahe hain kyunki
+    hum backend ko fetch API se data bhejna chahte hain.
+  */
+  e.preventDefault();
+
+  /*
+    FormData object banaya
+    → ye automatically form ke andar ke
+    sab input values collect kar leta hai.
+  */
+  const formData = new FormData(e.target);
+
+  /*
+    formData.get('url')
+    → input jiska name="url" hai
+    uski value nikaal rahe hain.
+  */
+  const url = formData.get('url');
+
+  /*
+    formData.get('shortCode')
+    → custom shortcode input ki value le rahe hain.
+  */
+ //now SHORTOCDE BECOME A VARIABLE WHICH CONTAINS THE VALUE OF SHORTCODE INPUT FIELD IN INDEX.HTML
+  const shortCode = formData.get('shortCode');
+
+  try {
+
+    /*
+      fetch('/shorten')
+      → backend API ko call kar rahe hain.
+
+      method: POST
+      → server ko data bhejna hai.
+
+      headers:
+      → bata rahe hain ki data JSON format me hai.
+    */
+    const response = await fetch('/shorten', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+
+      /*
+        body me data bhejna hota hai.
+        JSON.stringify()
+        → JS object ko JSON text me convert karta hai.
+      */
+     //sending url and short code to backend in form of JSON string  to backend ,as http can only read text data
+      body: JSON.stringify({
+        url,        // long URL
+        shortCode   // optional shortcode
+      })
+    });
+
+    /*
+      response.ok
+      → agar server ne success (200 status)
+      bheja hai to true hoga.
+    */
+    if (response.ok) {
+
+      /*
+        server JSON me response bhejta hai:
+        { shortUrl: "http://localhost:3002/abc123" }
+      */
+      const data = await response.json();
+      fetchShotenedUrls();//ye function call kar rahe hain taki jab bhi user naya url shorten kare to wo turant neeche list me show ho jaye
+
+      // user ko shortened link dikha rahe hain
+      alert("Short URL: " + data.shortUrl);
+
+    } else {
+
+      /*
+        agar error aaya (400, 404 etc)
+        to server ka error message read karte hain.
+      */
+      const errorText = await response.text();
+
+      alert("Error: " + errorText);
+    }
+
+  } catch (error) {
+
+    /*
+      agar network error ya JS error aaye
+      to console me print hoga.
+    */
+    console.log(error);
+  }
+});
+fetchShotenedUrls();//jab bhi page load hoga to ye function call hoga taki database me jitne bhi url hai wo sab neeche list me show ho jaye
+
+</script>
+</body>
+</html>

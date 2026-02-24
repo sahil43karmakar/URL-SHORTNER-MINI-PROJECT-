@@ -1,0 +1,24 @@
+{
+  "name": "url-shortener-mini",
+  "version": "1.0.0",
+  "description": "Mini URL Shortener using Express, MongoDB and NanoID",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "start": "nodemon app.js",
+    "dev": "nodemon app.js",
+    "test": "echo \"No tests specified\""
+  },
+  "keywords": ["nodejs", "express", "mongodb", "url-shortener"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ejs": "^4.0.1",
+    "express": "^5.2.1",
+    "mongoose": "^9.2.2",
+    "nanoid": "^5.1.6"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
