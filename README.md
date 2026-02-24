@@ -1,1 +1,1 @@
-# URL-SHORTNER-MINI-PROJECT-
+URL Shortener Mini Project is a simple web application built using Node.js, HTML, CSS, and JavaScript that converts long URLs into short, shareable links. The application accepts a long URL from the user, generates a unique short code, stores the mapping in a JSON file, and redirects users to the original website when the shortened link is accessed. This project demonstrates core backend concepts such as HTTP requests, routing, JSON handling, file system operations, and client–server communication without using Express.js.
